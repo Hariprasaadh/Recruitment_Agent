@@ -120,7 +120,7 @@ def assess_skills(state: GraphState) -> GraphState:
         Resume: {application}
         
         Evaluate based on:
-        - Required technical skills (Python, frameworks, databases, etc.)
+        - Required technical skills (TechStacks, frameworks, databases, etc.)
         - Preferred skills
         - Relevant project experience
         - Education qualifications
@@ -143,16 +143,19 @@ def schedule_interview(state: GraphState) -> GraphState:
     response = "Candidate has been shortlisted for an interview. Recommended for technical interview round."
     email_body = f"""Dear Candidate,
 
-Thank you for applying for the Python Developer position. Based on our review of your resume, we are pleased to invite you for a technical interview.
+    Thank you for your interest in joining our team. After reviewing your application, we are pleased to invite you to the next stage of our selection process - a technical interview.
 
-Next Steps:
-- Our HR team will contact you within 2-3 business days to schedule the interview.
-- Please prepare to discuss your experience with Python, Django/Flask, and cloud platforms.
+    Next Steps:
+        
+    - Our HR team will reach out to you within 2-3 business days to schedule the interview.
+    -Please be prepared to discuss your relevant technical experience, problem-solving approach, and project work.
 
-Best regards,
-Hiring Team
+    We look forward to speaking with you soon.
+
+    Best regards,
+    Hiring Team
 """
-    send_email(state["candidate_email"], "Interview Invitation - Python Developer Position", email_body)
+    send_email(state["candidate_email"], "Interview Invitation - Next Steps in Your Application Process", email_body)
     return {'response': response}
 
 def escalate_to_recruiter(state: GraphState) -> GraphState:
@@ -161,16 +164,16 @@ def escalate_to_recruiter(state: GraphState) -> GraphState:
     response = "Candidate has been escalated to a recruiter for senior-level review."
     email_body = f"""Dear Candidate,
 
-Thank you for applying for the Python Developer position. Your application has been escalated to our senior recruitment team for further review due to your extensive experience.
+    Thank you for applying for the Python Developer position. Your application has been escalated to our senior recruitment team for further review due to your extensive experience.
 
-Next Steps:
-- A senior recruiter will reach out within 3-5 business days to discuss potential opportunities.
-- Please feel free to contact us if you have any questions.
+    Next Steps:
+    - A senior recruiter will reach out within 3-5 business days to discuss potential opportunities.
+    - Please feel free to contact us if you have any questions.
 
-Best regards,
-Hiring Team
+    Best regards,
+    Hiring Team
 """
-    send_email(state["candidate_email"], "Application Update - Python Developer Position", email_body)
+    send_email(state["candidate_email"], "Application Update - Next Steps in the Review Process", email_body)
     return {'response': response}
 
 def reject_application(state: GraphState) -> GraphState:
@@ -179,14 +182,16 @@ def reject_application(state: GraphState) -> GraphState:
     response = "Candidate does not meet the minimum requirements for the position."
     email_body = f"""Dear Candidate,
 
-Thank you for applying for the Python Developer position. After careful consideration, we have determined that your qualifications do not fully meet the requirements for this role.
+    Thank you for your interest in joining our team. After careful consideration, we regret to inform you that we will not be moving forward with your application at this time.
 
-We appreciate your interest and encourage you to apply for other positions that align with your skills and experience.
+    We truly appreciate the effort you put into the application process and encourage you to explore other opportunities with us that may align more closely with your skills and experience in the future.
 
-Best regards,
-Hiring Team
+    Wishing you all the best in your career endeavors.
+
+    Best regards,
+    Hiring Team
 """
-    send_email(state["candidate_email"], "Application Update - Python Developer Position", email_body)
+    send_email(state["candidate_email"], "Application Update", email_body)
     return {'response': response}
 
 # Initialize workflow
@@ -470,38 +475,64 @@ def process_resume(uploaded_file, candidate_email, job_description, send_email):
 def display_screening_result(results):
     st.markdown("### 📊 Screening Results")
     
-    # Overview cards
     col1, col2, col3, col4 = st.columns(4)
-    
+
     with col1:
-        st.metric("Experience Level", results['experience_level'])
-    
+        st.markdown(f"""
+        <div class="metric-card">
+            <h4 style="margin: 0; color: #666; font-size: 0.9rem;">Experience Level</h4>
+            <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: bold; color: #333;">
+                {results['experience_level']}
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
     with col2:
         skill_match = results['skill_match']
         color = "🟢" if skill_match == "Match" else "🟡" if skill_match == "Partial Match" else "🔴"
-        st.metric("Skill Match", f"{color} {skill_match}")
-    
+        st.markdown(f"""
+        <div class="metric-card">
+            <h4 style="margin: 0; color: #666; font-size: 0.9rem;">Skill Match</h4>
+            <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: bold; color: #333;">
+                {color} {skill_match}
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
     with col3:
-        st.metric("Candidate", results['candidate_name'])
-    
+        candidate_name = results['candidate_name'][:20] + "..." if len(results['candidate_name']) > 20 else results['candidate_name']
+        st.markdown(f"""
+        <div class="metric-card">
+            <h4 style="margin: 0; color: #666; font-size: 0.9rem;">Candidate</h4>
+            <p style="margin: 0.5rem 0 0 0; font-size: 1.2rem; font-weight: bold; color: #333;" title="{results['candidate_name']}">
+                {candidate_name}
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
     with col4:
-        st.metric("Processed", results['timestamp'])
-    
+        # Format timestamp better
+        timestamp = results['timestamp']
+        date_part = timestamp.split(' ')[0]
+        time_part = timestamp.split(' ')[1][:5]  # Only show HH:MM
+        st.markdown(f"""
+        <div class="metric-card">
+            <h4 style="margin: 0; color: #666; font-size: 0.9rem;">Processed</h4>
+            <p style="margin: 0.5rem 0 0 0; font-size: 1rem; font-weight: bold; color: #333;">
+                {date_part}<br><small style="color: #666;">{time_part}</small>
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
     # Detailed results
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.markdown("#### 📝 Resume Preview")
-        with st.expander("View Extracted Text", expanded=False):
-            st.text_area("Resume Content", results['extracted_resume'], height=200, disabled=True)
+        
         
         st.markdown("#### 🎯 Final Decision")
-        decision_color = get_decision_color(results['response'])
-        st.markdown(f"""
-        <div style="background: {decision_color}; padding: 1rem; border-radius: 10px; margin: 1rem 0;">
-            <h4>Decision: {results['response']}</h4>
-        </div>
-        """, unsafe_allow_html=True)
+        display_decision_card(results)
+
     
     with col2:
         st.markdown("#### 📧 Contact Information")
@@ -517,13 +548,64 @@ def display_screening_result(results):
         if st.button("📋 Add Notes", use_container_width=True):
             show_notes_dialog(results)
 
-def get_decision_color(response):
+def get_decision_type(response):
+    """Determine decision type from response"""
     if "shortlisted" in response.lower() or "interview" in response.lower():
-        return "#d4edda"
+        return "interview"
     elif "escalated" in response.lower():
-        return "#fff3cd"
+        return "escalated"
     else:
-        return "#f8d7da"
+        return "rejected"
+
+def display_decision_card(results):
+    """Display decision with themed card design"""
+    decision_type = get_decision_type(results['response'])
+    
+    if decision_type == "interview":
+        theme = {
+            'background': 'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)',
+            'icon': '🎉',
+            'title': 'Congratulations!',
+            'subtitle': 'Interview Scheduled',
+            'color': '#2d5016'
+        }
+    elif decision_type == "escalated":
+        theme = {
+            'background': 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+            'icon': '⭐',
+            'title': 'Under Review',
+            'subtitle': 'Escalated to Senior Team',
+            'color': '#4a5568'
+        }
+    else:
+        theme = {
+            'background': 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+            'icon': '📝',
+            'title': 'Thank You',
+            'subtitle': 'Application Reviewed',
+            'color': '#744210'
+        }
+    
+    st.markdown(f"""
+    <div style="
+        background: {theme['background']};
+        color: {theme['color']};
+        padding: 2rem;
+        border-radius: 20px;
+        margin: 1rem 0;
+        text-align: center;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    ">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">{theme['icon']}</div>
+        <h2 style="margin: 0; font-size: 1.8rem; font-weight: bold;">{theme['title']}</h2>
+        <h3 style="margin: 0.5rem 0; font-size: 1.2rem; opacity: 0.8;">{theme['subtitle']}</h3>
+        <p style="margin: 1rem 0 0 0; font-size: 1rem; line-height: 1.4;">
+            {results['response']}
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
 
 def dashboard_interface():
     if not st.session_state.screening_results:
