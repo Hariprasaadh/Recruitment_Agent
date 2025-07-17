@@ -35,3 +35,8 @@ AI candidate screening application using Groq LLM, LangGraph workflows, and Stre
 | Email    | SMTP (Gmail)             |
 | Environment       | Python 3.8+         |
 
+
+
+**👉 [Launch Live Demo](https://recruitsystem.streamlit.app/)**
+
+
