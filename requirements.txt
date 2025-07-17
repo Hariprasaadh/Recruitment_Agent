@@ -1,0 +1,10 @@
+streamlit
+pandas
+numpy
+python-dotenv
+langchain-groq
+langgraph
+langchain-core
+typing-extensions
+PyPDF2
+plotly
